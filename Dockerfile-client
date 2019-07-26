@@ -1,0 +1,24 @@
+#
+# Build stage
+#
+FROM openjdk:11-jdk-slim AS build
+
+COPY .mvn /home/app/.mvn
+COPY tasks-client /home/app/tasks-client
+COPY tasks-server /home/app/tasks-server
+COPY mvnw /home/app/
+COPY pom.xml /home/app/
+WORKDIR /home/app
+RUN ./mvnw clean package
+
+#
+# Package stage
+#
+FROM openjdk:11-jre-slim
+
+COPY --from=build /home/app/tasks-client/target/tasks-client-0.0.1-SNAPSHOT.jar /home/app/tasks-client.jar
+COPY tasks-client/entrypoint.sh /home/app
+WORKDIR /home/app
+RUN chmod +x ./entrypoint.sh
+EXPOSE 8080
+CMD ["./entrypoint.sh"]

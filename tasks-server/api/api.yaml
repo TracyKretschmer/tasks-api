@@ -1,0 +1,144 @@
+openapi: 3.0.1
+info:
+  title: Tasks API
+  description: An API for keeping track of your tasks
+  termsOfService: ""
+  contact: {}
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /tasks/:
+    get:
+      tags:
+        - Tasks
+      summary: Get the list of Tasks
+      description: Loads a list of Tasks
+      operationId: getTasks
+      x-roles: SERVER, OTHER
+      responses:
+        200:
+          description: Status 200
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      tags:
+        - Tasks
+      summary: Create a Task
+      description: Adds a Task
+      operationId: createTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        201:
+          description: Status 201
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+  /tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Load an individual Task
+      description: Loads a Task
+      operationId: getTask
+      parameters:
+        - name: taskId
+          in: path
+          description: Identifier of the Task
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Status 200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    put:
+      tags:
+        - Tasks
+      summary: Update a Task
+      description: Stores a Task
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: path
+          description: Identifier of the Task
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        200:
+          description: Status 200
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a Task
+      description: Deletes a Task
+      operationId: deleteTask
+      parameters:
+        - name: taskId
+          in: path
+          description: Identifier of the Task
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Status 204
+          content: {}
+components:
+  schemas:
+    Task:
+      required:
+        - priority
+        - startDate
+        - status
+        - title
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: number
+        endDate:
+          type: number
+        priority:
+          type: number
+        category:
+          type: string
+        status:
+          type: string
+      description: A representation of a Task.
+  securitySchemes:
+    HTTP_BASIC:
+      type: http
+      description: All GET methods are public, meaning that *you can read all the
+        data*. Write operations require authentication and therefore are forbidden
+        to the general public.
+      scheme: basic

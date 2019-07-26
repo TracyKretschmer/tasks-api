@@ -1,0 +1,49 @@
+version: '3.5'
+
+services:
+  load-balancer:
+    image: jwilder/nginx-proxy
+    ports:
+      - "8080:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DEFAULT_HOST=tasks.server.com
+    networks:
+      - tasks-dmz
+      - tasks-frontend
+  tasks-server:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+    restart: always
+    expose:
+      - "8080"
+    depends_on:
+      - mongo
+    environment:
+      - HTTP_SERVER_PORT=8080
+      - MONGO_SERVER_PORT=27017
+      - MONGO_SERVER_HOST=mongo
+      - VIRTUAL_HOST=tasks.server.com
+    networks:
+      - tasks-frontend
+      - tasks-backend
+
+  mongo:
+    image: mongo
+    container_name: tasks-mongo
+    volumes:
+      - ./data/mongo-data:/data/db
+      - ./data/mongo-bkp:/data/bkp
+    restart: always
+    networks:
+      - tasks-backend
+
+networks:
+  tasks-dmz:
+    name: tasks-dmz-network
+  tasks-frontend:
+    name: tasks-frontend-network
+  tasks-backend:
+    name: tasks-backend-network
