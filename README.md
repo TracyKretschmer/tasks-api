@@ -48,7 +48,7 @@
 The server is configured behind a nginx proxy so it can be scaled
 
 ```
-docker-compose up --scale tasks-server=3
+docker-compose up --scale tasks-server=3 -d
 ```
     
 Reference: https://github.com/jwilder/nginx-proxy
